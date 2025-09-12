@@ -70,16 +70,28 @@ void mostrar_nro_BCD(uint8_t bcd, gpioConf_t * vector){
 	}
 
 void set_display(uint32_t dato, uint8_t digitos, gpioConf_t * vector_bcd, gpioConf_t*vector_pulso){
-	uint8_t bcd_array[3],n;
+	uint8_t bcd_array[digitos],n;
 	conversor_binario_BCD(dato,digitos,bcd_array);
-	for (n=digitos;n>0;n++){
-
+	for (n=digitos;n>0;n--){
+		mostrar_nro_BCD(bcd_array[n-1],vector_bcd);
+		GPIOOn(vector_pulso[n-1].pin);
 	}
 }
 
 void app_main(void){
 	uint8_t bcd_array[3];
 	conversor_binario_BCD(10,2,bcd_array);
+	gpioConf_t b0= {GPIO_20, 1};
+	gpioConf_t b1={GPIO_21, 1};
+	gpioConf_t b2= {GPIO_22,1};
+	gpioConf_t b3= {GPIO_23,1};
+	gpioConf_t vector_conversor[4];
+	vector_conversor[0] = b0;
+	vector_conversor[1] = b1;
+	vector_conversor[2] = b2;
+	vector_conversor[3] = b3;
+
 
 }
+
 /*==================[end of file]============================================*/
