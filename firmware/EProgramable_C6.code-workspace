@@ -26,6 +26,9 @@
         },
         {
             "path": "projects/Guia1_ej4_5_6"
+        },
+        {
+            "path": "projects/Proyecto2"
         }
     ],
     "settings": {
@@ -80,6 +83,8 @@
             "mpu6050.h": "c",
             "i2c_mcu.h": "c"
         },
+        "editor.fastScrollSensitivity": 3,
+        "editor.mouseWheelScrollSensitivity": 3,
     },
     "tasks": {
         "version": "2.0.0",
