@@ -59,14 +59,14 @@ void conversor_binario_BCD(uint32_t dato, uint8_t nrodigitos, uint8_t * bcd){
 
 void mostrar_nro_BCD(uint8_t bcd, gpioConf_t * vector){
 	uint8_t n;
-	for (n=0; n<4; n++)
+	for (n=0; n<4; n++){
 		if (bcd&1){
 			GPIOOn(vector[n].pin);
 
 		} else {
 			GPIOOff(vector[n].pin);
 		};
-		bcd=bcd>>1;
+		bcd=bcd>>1;}
 	}
 
 void set_display(uint32_t dato, uint8_t digitos, gpioConf_t * vector_bcd, gpioConf_t*vector_pulso){
@@ -75,12 +75,11 @@ void set_display(uint32_t dato, uint8_t digitos, gpioConf_t * vector_bcd, gpioCo
 	for (n=digitos;n>0;n--){
 		mostrar_nro_BCD(bcd_array[n-1],vector_bcd);
 		GPIOOn(vector_pulso[n-1].pin);
+		GPIOOff(vector_pulso[n-1].pin);
 	}
 }
 
 void app_main(void){
-	uint8_t bcd_array[3];
-	conversor_binario_BCD(10,2,bcd_array);
 	gpioConf_t b0= {GPIO_20, 1};
 	gpioConf_t b1={GPIO_21, 1};
 	gpioConf_t b2= {GPIO_22,1};
@@ -90,6 +89,27 @@ void app_main(void){
 	vector_conversor[1] = b1;
 	vector_conversor[2] = b2;
 	vector_conversor[3] = b3;
+
+	/* para vector de pulsos*/
+	gpioConf_t centena= {GPIO_19, 1};
+	gpioConf_t decena={GPIO_18, 1};
+	gpioConf_t unidad= {GPIO_9,1};
+	gpioConf_t vector_pulsos[3];
+	vector_pulsos[0]=centena;
+	vector_pulsos[1]=decena;
+	vector_pulsos[2]=unidad;
+	uint8_t i;
+	for(i=0; i<4; i++)
+		{GPIOInit(vector_conversor[i].pin,vector_conversor[i].dir);};
+	for(i=0; i<3; i++)
+		{GPIOInit(vector_pulsos[i].pin,vector_pulsos[i].dir);};
+
+	set_display(222,3,vector_conversor,vector_pulsos);
+	while (1)
+	{
+		/* code */
+	}
+	
 
 
 }
