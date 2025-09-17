@@ -1,16 +1,18 @@
-/*! @mainpage Blinking switch
+/*! @mainpage Proyecto 1, ej 2. Versión modificada de 'blinking_switch'
  *
  * \section genDesc General Description
  *
- * This example makes LED_1 and LED_2 blink if SWITCH_1 or SWITCH_2 are pressed.
+ * Este código hace titilar los LED 1 y 2 al presionar las teclas 1 y 2 correspondientemente; 
+ * si se presionan las teclas 1 y 2 juntas, titila el LED 3.
  *
+ * 
  * @section changelog Changelog
  *
  * |   Date	    | Description                                    |
  * |:----------:|:-----------------------------------------------|
- * | 12/09/2023 | Document creation		                         |
+ * | 15/09/2025 | Document creation		                         |
  *
- * @author Albano Peñalva (albano.penalva@uner.edu.ar)
+ * @author Andreoli Aguilar, Julieta
  *
  */
 
@@ -23,14 +25,20 @@
 #include "led.h"
 #include "switch.h"
 /*==================[macros and definitions]=================================*/
+/** @def CONFIG_BLINK_PERIOD 
+ * @brief constante usada para marcar el ritmo del blinking
+ */
 #define CONFIG_BLINK_PERIOD 500
 /*==================[internal data definition]===============================*/
-
+/** @def teclas  
+ * @brief Variable que almacena qué tecla es presionada
+ */
+uint8_t teclas;
 /*==================[internal functions declaration]=========================*/
 
 /*==================[external functions definition]==========================*/
 void app_main(void){
-	uint8_t teclas;
+
 	LedsInit();
 	SwitchesInit();
 	LedOff(LED_1);
@@ -40,7 +48,7 @@ void app_main(void){
     	teclas  = SwitchesRead();
 			switch(teclas){
     		case SWITCH_1:
-				LedToggle(LED_1);
+				LedToggle(LED_1);	
     		break;
     		case SWITCH_2:
     			LedToggle(LED_2);

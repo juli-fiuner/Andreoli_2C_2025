@@ -1,10 +1,9 @@
-/*! @mainpage Template
+/*! @mainpage Proyecto 1, ejercicios 4, 5 y 6
  *
  * @section genDesc General Description
  *
- * This section describes how the program works.
- *
- * <a href="https://drive.google.com/...">Operation Example</a>
+ * Este código convierte un número decimal a BCD para luego mostrarlo en un BCD 7 segmentos 
+
  *
  * @section hardConn Hardware Connection
  *
@@ -17,10 +16,10 @@
  *
  * |   Date	    | Description                                    |
  * |:----------:|:-----------------------------------------------|
- * | 12/09/2023 | Document creation		                         |
+ * | 15/09/2025 | Document creation		                         |
  *
- * @author Albano Peñalva (albano.penalva@uner.edu.ar)
- *
+ * @author Andreoli Aguilar, Julieta
+ * 
  */
 
 /*==================[inclusions]=============================================*/
@@ -33,46 +32,106 @@
 
 /*==================[macros and definitions]=================================*/
 
+
 /*==================[internal data definition]===============================*/
+/** @def struct gpioConf_t
+ *  @brief configuración de un GPIO, este struct contiene los parámetros necesarios para inicializar un GPIO : pin y dirección (output o input)
+ */
 typedef struct{
-		gpio_t pin;
-		io_t dir;
+		gpio_t pin; /// Nro de pin
+		io_t dir; /// lo establece como entrada/input (0) o salida/output (1)
 	}gpioConf_t;
+
+/** @def resto  
+ * @brief Variable que almacena el resto de una división por 10
+ */
+uint8_t resto;	
+
+/** @def dato  
+ * @brief Contiene el número que se quiere convertir a BCD y/o mostrarse en la pantalla del BCD 7 segmentos
+ */
+uint32_t dato;
+
+/** @def nrodigitos  
+ * @brief Indica la cantidad de dígitos que forman el dato
+ */
+uint8_t nrodigitos;
+
+/** @def bcd_array  
+ * @brief arreglo que almacena el dato en su formato BCD, es decir
+ * separado en centenas, decenas, unidades (en ese orden). Por ejemplo: el número 123 se almacena como [1, 2, 3]
+ */
+uint8_t bcd_array;
+
+/** @def vector_bcd  
+ * @brief Vector que se utiliza para enviar información a los conversores BCD 7 segmentos.
+ * Cada elemento está conectado a un GPIO de salida y se cambia el estado de cada uno, a ‘0’ o a ‘1’, 
+ * según el estado del bit correspondiente en el BCD ingresado
+ */
+gpioConf_t vector_bcd;
+
+/** @def vector_pulsos  
+ * @brief Cada elemento de este vector está conectado a un GPIO, establecido como salida,
+ * conectado 1 a cada conversor BCD 7 segmentos, para así unir el BCD con el LCD correspondiente (unidad, decena o centena)
+ */
+gpioConf_t vector_pulsos;
+
+
 /*==================[internal functions declaration]=========================*/
+/** @fn void conversor_binario_BCD(uint32_t dato, uint8_t nrodigitos, uint8_t * bcd_array)
+ *  @brief Esta función toma el dato ingresado, lo convierte en BCD y guarda cada dígito en el un puntero de tipo arreglo. 
+ *  Corresponde al ejercicio 4
+ *  @param uint32_t dato, uint8_t nrodigitos, uint8_t * bcd_array
+ *  @return
+ */
+void conversor_binario_BCD(uint32_t dato, uint8_t nrodigitos, uint8_t * bcd_array);
+
+/** @fn void mostrar_nro_BCD(uint8_t bcd_array, gpioConf_t * vector_bcd)
+ * @brief Esta función toma un arreglo (donde cada dato representa un número en bd) 
+ * y configura el estado de los GPIO como '0' o '1' según el bit correspondiente. 
+ * Corresponde al ejercicio 5
+ * @param uint8_t bcd_array, gpioConf_t * vector_bcd
+ * @return
+ */
+void mostrar_nro_BCD(uint8_t bcd_array, gpioConf_t * vector_bcd);
+
+/** @fn void set_display(uint32_t dato, uint8_t nrodigitos, gpioConf_t * vector_bcd, gpioConf_t*vector_pulso)
+ * @brief La función set_display toma el dato ingresado y lo muestra en pantalla, usa las funciones conversor_binario_BCD
+ * y mostrar_nro_BCD para lograrlo. 
+ * Corresponde al ejercicio 6.
+ * @param uint32_t dato, uint8_t nrodigitos, gpioConf_t * vector_bcd, gpioConf_t*vector_pulso
+ * @return
+ */
+void set_display(uint32_t dato, uint8_t nrodigitos, gpioConf_t * vector_bcd, gpioConf_t*vector_pulso);
 
 /*==================[external functions definition]==========================*/
 
-/* act 4: función que convierta un nro a BCD y guardar cada digito en un puntero de tipo arreglo */
-
-
-void conversor_binario_BCD(uint32_t dato, uint8_t nrodigitos, uint8_t * bcd){
-	uint8_t i, resto;
+void conversor_binario_BCD(uint32_t dato, uint8_t nrodigitos, uint8_t * bcd_array){
+	uint8_t i;
 	/* pongo cada digito en el array, sigue como binario*/
 	for (i=nrodigitos; i>0; i--){
 		resto= dato%10;
-		bcd[i-1]= resto;
+		bcd_array[i-1]= resto;
 		dato=dato/10;
 	}
 }
 
-/* act 5: recibe bcd_array luego de pasar por el conversor y el vector de GPIO */
-
-void mostrar_nro_BCD(uint8_t bcd, gpioConf_t * vector){
+void mostrar_nro_BCD(uint8_t bcd_array, gpioConf_t * vector_bcd){
 	uint8_t n;
 	for (n=0; n<4; n++){
-		if (bcd&1){
-			GPIOOn(vector[n].pin);
+		if (bcd_array&1){
+			GPIOOn(vector_bcd[n].pin);
 
 		} else {
-			GPIOOff(vector[n].pin);
+			GPIOOff(vector_bcd[n].pin);
 		};
-		bcd=bcd>>1;}
+		bcd_array=bcd_array>>1;}
 	}
 
-void set_display(uint32_t dato, uint8_t digitos, gpioConf_t * vector_bcd, gpioConf_t*vector_pulso){
-	uint8_t bcd_array[digitos],n;
-	conversor_binario_BCD(dato,digitos,bcd_array);
-	for (n=digitos;n>0;n--){
+void set_display(uint32_t dato, uint8_t nrodigitos, gpioConf_t * vector_bcd, gpioConf_t*vector_pulso){
+	uint8_t bcd_array[nrodigitos],n;
+	conversor_binario_BCD(dato,nrodigitos,bcd_array);
+	for (n=nrodigitos;n>0;n--){
 		mostrar_nro_BCD(bcd_array[n-1],vector_bcd);
 		GPIOOn(vector_pulso[n-1].pin);
 		GPIOOff(vector_pulso[n-1].pin);
