@@ -1,4 +1,4 @@
-/*! @mainpage Template
+/*! @mainpage Proyecto 2 ej 3. Interrupciones y puerto serie
  *
  * @section genDesc General Description
  *
@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "led.h"
@@ -34,8 +35,10 @@
 #include "lcditse0803.h"
 #include "switch.h"
 #include "timer_mcu.h"
+#include "uart_mcu.h"
 
 /*==================[macros and definitions]=================================*/
+#define CONFIG_PERIOD_TECLA2_US 1000000 /*1seg*/
 #define CONFIG_PERIOD_TECLA1_US 1000000
 
 /*==================[internal data definition]===============================*/
@@ -50,6 +53,21 @@ void FuncTimerA(void* param){ /*funcion de atencion de interrupcion*/
 }
 
 /*==================[external functions definition]==========================*/
+
+/**función de leer teclas 
+
+ * si tecla=switch_1 --> variable=0 --> se prende
+ * 
+ * si again tecla=switch_1 --> variable= 1 --> se apaga
+*/
+
+void leer_tecla1(){
+	variable_control_1=!variable_control_1;       
+}
+
+void leer_tecla2(){
+	variable_control_2=!variable_control_2;
+}
 
 
 static void controlar_by_medida(void *pvParameter){
@@ -88,23 +106,13 @@ static void controlar_by_medida(void *pvParameter){
             LcdItsE0803Write(medida);
         }
 
+		uint8_t *msj =UartItoa(medida,10);
+		UartSendString(UART_PC,(char *)msj);
+		UartSendString(UART_PC," cm\r\n");
         }
 }
 
-/** tarea de leer teclas 
-
- * si tecla=switch_1 --> variable=0 --> se prende
- * 
- * si again tecla=switch_1 --> variable= 1 --> se apaga
-*/
-
-void leer_tecla1(){
-	variable_control_1=!variable_control_1;       
-}
-
-void leer_tecla2(){
-	variable_control_2=!variable_control_2;
-}
+/**otro task que envie el string de medidas */
 
 void app_main(void){
     HcSr04Init(GPIO_3, GPIO_2);
@@ -121,6 +129,14 @@ void app_main(void){
         .param_p = NULL
     };
     TimerInit(&timer);
+
+	serial_config_t my_uart={
+		.port=UART_PC,
+		.baud_rate = 9600,
+		.func_p= NULL,
+		.param_p=NULL	
+	};
+	UartInit(&my_uart);
 
     xTaskCreate(&controlar_by_medida, "Control de leds y lcd", 2048, NULL, 5, &led1_task_handle);
 	TimerStart(timer.timer);
