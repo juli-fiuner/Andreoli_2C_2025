@@ -102,7 +102,7 @@ case TOGGLE:
 void app_main(void){
 	LedsInit();
 	struct LED led={TOGGLE,LED_1,10,500};
-	ActivarLED(&led);
+	ActivarLED(&led); // si envío con &, la función debe recibir con *
 
 }
 

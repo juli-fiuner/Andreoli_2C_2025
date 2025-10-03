@@ -3,7 +3,6 @@
  * @section genDesc General Description
  *
  * Este código convierte un número decimal a BCD para luego mostrarlo en un BCD 7 segmentos 
-
  *
  * @section hardConn Hardware Connection
  *
@@ -41,7 +40,8 @@
 
 /*==================[internal data definition]===============================*/
 /** @def struct gpioConf_t
- *  @brief configuración de un GPIO, este struct contiene los parámetros necesarios para inicializar un GPIO : pin y dirección (output o input)
+ *  @brief configuración de un GPIO, este struct contiene los parámetros necesarios para inicializar un GPIO:
+ *  pin y dirección (output o input)
  */
 typedef struct{
 		gpio_t pin; /// Nro de pin
@@ -93,7 +93,7 @@ gpioConf_t vector_pulsos;
 void conversor_binario_BCD(uint32_t dato, uint8_t nrodigitos, uint8_t * bcd_array);
 
 /** @fn void mostrar_nro_BCD(uint8_t bcd_array, gpioConf_t * vector_bcd)
- * @brief Esta función toma un arreglo (donde cada dato representa un número en bd) 
+ * @brief Esta función toma un arreglo (donde cada dato representa un número en bcd) 
  * y configura el estado de los GPIO como '0' o '1' según el bit correspondiente. 
  * Corresponde al ejercicio 5
  * @param uint8_t bcd_array, gpioConf_t * vector_bcd
@@ -102,8 +102,8 @@ void conversor_binario_BCD(uint32_t dato, uint8_t nrodigitos, uint8_t * bcd_arra
 void mostrar_nro_BCD(uint8_t bcd_array, gpioConf_t * vector_bcd);
 
 /** @fn void set_display(uint32_t dato, uint8_t nrodigitos, gpioConf_t * vector_bcd, gpioConf_t*vector_pulso)
- * @brief La función set_display toma el dato ingresado y lo muestra en pantalla, usa las funciones conversor_binario_BCD
- * y mostrar_nro_BCD para lograrlo. 
+ * @brief La función set_display toma el dato ingresado y lo muestra en pantalla, usa las 
+ * funciones conversor_binario_BCD y mostrar_nro_BCD para lograrlo. 
  * Corresponde al ejercicio 6.
  * @param uint32_t dato, uint8_t nrodigitos, gpioConf_t * vector_bcd, gpioConf_t*vector_pulso
  * @return
@@ -125,13 +125,13 @@ void conversor_binario_BCD(uint32_t dato, uint8_t nrodigitos, uint8_t * bcd_arra
 void mostrar_nro_BCD(uint8_t bcd_array, gpioConf_t * vector_bcd){
 	uint8_t n;
 	for (n=0; n<4; n++){
-		if (bcd_array&1){
+		if (bcd_array&1){ //AND a nivel de bits, analiza bit a bit, solo da 1 si hay un 1 en ambos
 			GPIOOn(vector_bcd[n].pin);
 
 		} else {
 			GPIOOff(vector_bcd[n].pin);
 		};
-		bcd_array=bcd_array>>1;}
+		bcd_array=bcd_array>>1;} //lo corre 1 a la derecha -->
 	}
 
 void set_display(uint32_t dato, uint8_t nrodigitos, gpioConf_t * vector_bcd, gpioConf_t*vector_pulso){

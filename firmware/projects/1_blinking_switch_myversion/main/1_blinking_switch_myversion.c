@@ -56,7 +56,7 @@ void app_main(void){
 			case (SWITCH_1 | SWITCH_2):
 				LedToggle(LED_3);
 			break;
-			vTaskDelay(CONFIG_BLINK_PERIOD / portTICK_PERIOD_MS);
+			vTaskDelay(CONFIG_BLINK_PERIOD / portTICK_PERIOD_MS); //probar eliminando esta linea, creo que es innecesaria y no hace nada :P
 
     	}
 		vTaskDelay(CONFIG_BLINK_PERIOD / portTICK_PERIOD_MS);
