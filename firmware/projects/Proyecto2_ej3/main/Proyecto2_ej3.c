@@ -84,7 +84,7 @@ void leer_tecla2(){
 static void controlar_by_medida(void *pvParameter){
     while(true){
 		ulTaskNotifyTake(pdTRUE, portMAX_DELAY);    /* La tarea espera en este punto hasta recibir una notificación */
-        if (!variable_control_1){
+        if (!variable_control_1){ //variable = 0 --> mide, =1 --> no mide
         medida = HcSr04ReadDistanceInCentimeters();
             if (medida<10){
                 LedOff(LED_1);
@@ -111,7 +111,7 @@ static void controlar_by_medida(void *pvParameter){
             medida=0;
         }
 
-        if (!variable_control_2){
+        if (!variable_control_2){ // variable = 0 --> muestra medidas nuevas, =1 --> se mantiene
             LcdItsE0803Write(medida);
             uint8_t *msj =UartItoa(medida,10);
 		    UartSendString(UART_PC,(char *)msj);
