@@ -89,12 +89,6 @@ static void controlar_by_medida(void *pvParameter){
         }
 }
 
-/** tarea de leer teclas 
-
- * si tecla=switch_1 --> variable=0 --> se prende
- * 
- * si again tecla=switch_1 --> variable= 1 --> se apaga
-*/
 
 void leer_tecla1(){
 	variable_control_1=!variable_control_1;       
