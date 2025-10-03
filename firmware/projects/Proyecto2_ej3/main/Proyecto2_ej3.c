@@ -52,6 +52,18 @@ void FuncTimerA(void* param){ /*funcion de atencion de interrupcion*/
     vTaskNotifyGiveFromISR(led1_task_handle, pdFALSE);    /* Envía una notificación a la tarea asociada al LED_1 que caducó el timer */
 }
 
+void Leertecla_UART(void *param){
+    uint8_t tecla;
+    UartReadByte(UART_PC,&tecla);
+    if (tecla == 'o'){
+        variable_control_1=!variable_control_1;
+    }else if (tecla =='h'){
+    	variable_control_2=!variable_control_2;
+    }
+}
+
+
+
 /*==================[external functions definition]==========================*/
 
 /**función de leer teclas 
@@ -60,7 +72,6 @@ void FuncTimerA(void* param){ /*funcion de atencion de interrupcion*/
  * 
  * si again tecla=switch_1 --> variable= 1 --> se apaga
 */
-
 void leer_tecla1(){
 	variable_control_1=!variable_control_1;       
 }
@@ -95,8 +106,6 @@ static void controlar_by_medida(void *pvParameter){
                 LedOn(LED_3);
                 
             }
-
-            vTaskDelay(1000 / portTICK_PERIOD_MS);         
             
         }else{
             medida=0;
@@ -104,15 +113,16 @@ static void controlar_by_medida(void *pvParameter){
 
         if (!variable_control_2){
             LcdItsE0803Write(medida);
+            uint8_t *msj =UartItoa(medida,10);
+		    UartSendString(UART_PC,(char *)msj);
+		    UartSendString(UART_PC," cm\r\n");
         }
 
-		uint8_t *msj =UartItoa(medida,10);
-		UartSendString(UART_PC,(char *)msj);
-		UartSendString(UART_PC," cm\r\n");
+
         }
 }
 
-/**otro task que envie el string de medidas */
+
 
 void app_main(void){
     HcSr04Init(GPIO_3, GPIO_2);
@@ -121,6 +131,7 @@ void app_main(void){
     SwitchesInit();
 	SwitchActivInt(SWITCH_1, leer_tecla1, NULL);
 	SwitchActivInt(SWITCH_2, leer_tecla2, NULL);
+
 
     timer_config_t timer= {
         .timer = TIMER_A,
@@ -133,7 +144,7 @@ void app_main(void){
 	serial_config_t my_uart={
 		.port=UART_PC,
 		.baud_rate = 9600,
-		.func_p= NULL,
+		.func_p= Leertecla_UART,
 		.param_p=NULL	
 	};
 	UartInit(&my_uart);
