@@ -41,7 +41,7 @@
 
 /** @brief Período de interrupción del temporizador DA en microsegundos (= 20 ms)
  */
-#define CONFIG_PERIOD_TIMER_DA_US 20000 /*deberían ser 4ms pero no anduvo, volver a probar*/
+#define CONFIG_PERIOD_TIMER_DA_US 4000 /*deberían ser 4ms pero no anduvo, volver a probar*/
 
 
 /*==================[internal data definition]===============================*/
